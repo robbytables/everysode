@@ -1,15 +1,12 @@
 <script>
-  export let errors = null;
-  export let values = null;
-  export let message = null;
+  export let form;
+  export let values;
+  export let message;
 </script>
 
 <section>
   <div>
     <h1>Register</h1>
-    {#if errors}
-      <div>{errors.form}</div>
-    {/if}
     {#if message}
       <div>{message}</div>
     {/if}

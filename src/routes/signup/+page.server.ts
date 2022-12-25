@@ -1,50 +1,35 @@
 import { supabase } from '$lib/supabaseClient';
+import { redirect, fail } from '@sveltejs/kit';
 
-export const GET = async ({ locals }) => {
-    // if the user is already logged in, then redirect to the dashboard
-    if (locals.user) {
-        return {
-            status: 303,
-            headers: {
-                location: '/dashboard'
-            }
-        };
-    }
-    return {
-        status: 200
-    };
-};
-
-export const POST = async ({ request, url }) => {
-    console.log('asshole')
+export const actions = {
+  default: async ({request}) => {
     const data = await request.formData();
-    debugger
     const email = data.get('email');
     const password = data.get('password');
 
-    const errors = {};
     const values = { email, password };
 
     const { error } = await supabase.auth.signUp(
         { email, password }, 
-        { redirectTo: `${url.origin}/logging-in`}
     );
 
     if (error) {
-        errors.form = error.message;
-        return {
-            status: 400,
-            body: {
-                errors,
-                values
-            }
-        };
+        return fail(404, { body: error.message });
     }
 
     return {
-        status: 200,
-        body: {
-            message: 'Please check your email for a confirmation email.'
-        }
+      success: 'Please check your email for a confirmation.'
+    }
+  }
+}
+
+export const GET = async ({ locals }) => {
+    // if the user is already logged in, then redirect to the dashboard
+    if (locals.user) {
+      throw redirect(303, '/dashboard')
+    }
+    return {
+        success: 'success'
     };
 };
+
